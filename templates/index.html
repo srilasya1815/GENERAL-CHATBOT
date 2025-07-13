@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>General Chatbot</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/4712/4712035.png">
+
+<style>
+/* Your CSS (unchanged, since it’s already correct and good) */
+body {
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #f4f4f9, #dcdcdc);
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+}
+
+.container {
+  background: #fff;
+  border-radius: 50px;
+  padding: 30px;
+  width: 1300px;
+  height: 700px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.1);
+  position: relative;
+  background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS3eUEBU7LaLjIHhLduq-_tcu5nUT-QINDJhWEAVyFGY1Pz8mU_U9NLtOs&s'); 
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  overflow: hidden;
+}
+.container::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50px;
+  pointer-events: none;
+  z-index: 0;
+}
+.container > * {
+  position: relative;
+  z-index: 1;
+}
+
+h2 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.center-text {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  text-align: center;
+}
+
+#chat-box {
+  height: 550px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 10px;
+  margin-bottom: 10px;
+  background: #fdfdff;
+}
+
+.message {
+  margin: 5px 0;
+}
+.user {
+  color: #4a90e2;
+}
+.bot {
+  color: #50b874;
+}
+
+.input-container {
+  display: flex;
+  gap: 10px;
+}
+input[type="text"] {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  outline: none;
+}
+button {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: bold;
+  color: #fff;
+  background: linear-gradient(45deg, #ff6ec4, #7873f5, #4ADE80);
+  transition: transform 0.2s;
+}
+button:hover {
+  transform: scale(1.05);
+}
+
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.icon-btn {
+  background: linear-gradient(90deg, #ff758c, #ff7eb3, #65e4a3);
+  border: none;
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #fff;
+  font-size: 22px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  transition: transform 0.2s;
+}
+.icon-btn:hover {
+  transform: scale(1.08);
+}
+.icon-btn svg {
+  width: 22px;
+  height: 22px;
+  fill: #fff;
+}
+
+.past-chats-modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0; top: 0; width: 100vw; height: 100vh;
+  background: rgba(0,0,0,0.3);
+  justify-content: center;
+  align-items: center;
+}
+.past-chats-content {
+  background: #fff;
+  border-radius: 20px;
+  padding: 30px 20px;
+  width: 400px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 0 20px rgba(0,0,0,0.15);
+}
+.past-chats-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+.past-chats-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.past-chats-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f4f4f9;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.past-chats-list li:hover {
+  background: #e0e7ff;
+}
+.past-chats-title {
+  font-weight: bold;
+  color: #4a90e2;
+  flex: 1;
+  text-align: left;
+  margin-right: 10px;
+  font-size: 15px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.delete-chat-btn {
+  background: none;
+  border: none;
+  color: #ff5c5c;
+  font-size: 18px;
+  cursor: pointer;
+  margin-left: 8px;
+  transition: color 0.2s;
+}
+.delete-chat-btn:hover {
+  color: #d90429;
+}
+.close-modal-btn {
+  background: none;
+  border: none;
+  font-size: 22px;
+  color: #333;
+  cursor: pointer;
+}
+
+/* Responsive styles */
+@media (max-width: 900px) {
+  .container {
+    width: 98vw;
+    height: 90vh;
+    padding: 10px;
+    border-radius: 25px;
+  }
+  #chat-box {
+    height: 50vh;
+    font-size: 15px;
+  }
+  .past-chats-content {
+    width: 90vw;
+    padding: 15px 5px;
+  }
+}
+@media (max-width: 600px) {
+  .container {
+    width: 100vw;
+    height: 100vh;
+    border-radius: 0;
+    padding: 5px;
+    box-shadow: none;
+  }
+  .top-bar {
+    margin-top: 24%;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  h2 {
+    font-size: 20px;
+    margin-bottom: 10px;
+  }
+  #chat-box {
+    height: 45vh;
+    padding: 5px;
+    font-size: 14px;
+  }
+  .input-container {
+    flex-direction: column;
+    gap: 5px;
+  }
+  input[type="text"] {
+    font-size: 15px;
+    padding: 8px;
+  }
+  button {
+    font-size: 16px;
+    padding: 8px 10px;
+    width: auto;
+    height: 38px;
+    border-radius: 16px;
+  }
+  .icon-btn {
+    width: 44px;
+    height: 44px;
+    font-size: 22px;
+  }
+  .past-chats-content {
+    width: 98vw;
+    padding: 10px 2px;
+    border-radius: 10px;
+  }
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+  <div class="top-bar">
+    <button class="icon-btn" title="View Past Chats" onclick="openPastChatsModal()">
+      <svg viewBox="0 0 24 24"><path d="M12 1.75A10.25 10.25 0 1 0 22.25 12 10.262 10.262 0 0 0 12 1.75zm0 18.5A8.25 8.25 0 1 1 20.25 12 8.26 8.26 0 0 1 12 20.25zm.75-13.5h-1.5v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+    </button>
+    <h2 style="flex:1; text-align:center; margin:0;">General Chatbot</h2>
+    <button class="icon-btn" title="Start New Chat" onclick="startNewChat()">
+      <svg viewBox="0 0 24 24"><path d="M12 5v14m7-7H5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+    </button>
+  </div>
+
+  <div id="chat-box">
+    <div class="center-text">
+      <h2>Hi, How can I help you?</h2>
+    </div>
+  </div>
+
+  <div class="input-container">
+    <input type="text" id="user-input" placeholder="Type your question...">
+    <button onclick="sendMessage()">Send</button>
+  </div>
+</div>
+
+<!-- Past Chats Modal -->
+<div class="past-chats-modal" id="past-chats-modal">
+  <div class="past-chats-content">
+    <div class="past-chats-header">
+      <span style="font-size:18px;font-weight:bold;">Past Chats</span>
+      <button class="close-modal-btn" onclick="closePastChatsModal()">&times;</button>
+    </div>
+    <ul class="past-chats-list" id="past-chats-list"></ul>
+  </div>
+</div>
+
+<script>
+function sendMessage() {
+  const input = document.getElementById("user-input");
+  const message = input.value.trim();
+  if (!message) return;
+
+  addMessage("user", message);
+  input.value = "";
+
+  fetch("/ask", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ message })
+  })
+  .then(res => res.json())
+  .then(data => {
+    addBotMessageFormatted(data.bot);
+  })
+  .catch(() => {
+    addBotMessageFormatted("Sorry, there was an error. Please try again.");
+  });
+}
+
+function addMessage(sender, text) {
+  const chatBox = document.getElementById("chat-box");
+  const div = document.createElement("div");
+  div.className = `message ${sender}`;
+  div.textContent = `${sender}: ${text}`;
+  chatBox.appendChild(div);
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+function addBotMessageFormatted(text) {
+  const chatBox = document.getElementById("chat-box");
+  const div = document.createElement("div");
+  div.className = "message bot";
+  let html = text
+    .replace(/^### (.*)$/gm, '<strong>$1</strong>')
+    .replace(/^\s*-\s(.*)$/gm, '<li>$1</li>')
+    .replace(/^\s*\d+\.\s(.*)$/gm, '<li>$1</li>')
+    .replace(/\\(.?)\\*/g, '<b>$1</b>')
+    .replace(/\n{2,}/g, '<br><br>')
+    .replace(/\n/g, '<br>');
+
+  if (html.includes('<li>')) {
+    html = `<ul>${html}</ul>`;
+  }
+
+  div.innerHTML = `bot: ${html}`;
+  chatBox.appendChild(div);
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+function startNewChat() {
+  fetch("/new_chat", { method: "POST" })
+  .then(res => res.json())
+  .then(() => {
+    document.getElementById("chat-box").innerHTML =
+      `<div class="center-text"><h2>Hi, How can I help you?</h2></div>`;
+    document.getElementById("user-input").value = "";
+  })
+  .catch(() => {
+    alert("Failed to start a new chat.");
+  });
+}
+
+function openPastChatsModal() {
+  fetch("/past_chats")
+  .then(res => res.json())
+  .then(data => {
+    const list = document.getElementById("past-chats-list");
+    list.innerHTML = "";
+    data.chats.forEach((chat, idx) => {
+      if (!Array.isArray(chat) || chat.length === 0) return;
+      const title = (chat[0] && chat[0].user) ? chat[0].user : `Chat ${idx+1}`;
+      const li = document.createElement("li");
+      li.onclick = () => selectChat(idx);
+      li.innerHTML = `
+        <span class="past-chats-title">${title}</span>
+        <button class="delete-chat-btn" onclick="event.stopPropagation(); deleteChat(${idx});">&times;</button>
+      `;
+      list.appendChild(li);
+    });
+    document.getElementById("past-chats-modal").style.display = "flex";
+  })
+  .catch(() => {
+    alert("Failed to load past chats.");
+  });
+}
+
+function closePastChatsModal() {
+  document.getElementById("past-chats-modal").style.display = "none";
+}
+
+function selectChat(idx) {
+  fetch("/select_chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ chat_idx: idx })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.status === "ok") {
+      const chatBox = document.getElementById("chat-box");
+      chatBox.innerHTML = "";
+      data.chat.forEach(msg => {
+        addMessage("user", msg.user);
+        addBotMessageFormatted(msg.bot);
+      });
+      closePastChatsModal();
+      document.getElementById("user-input").value = "";
+    }
+  })
+  .catch(() => {
+    alert("Failed to select chat.");
+  });
+}
+
+function deleteChat(idx) {
+  fetch("/delete_chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ chat_idx: idx })
+  })
+  .then(() => openPastChatsModal())
+  .catch(() => {
+    alert("Failed to delete chat.");
+  });
+}
+
+// Optional: Close modal when clicking outside content
+document.getElementById("past-chats-modal").addEventListener("click", function(e) {
+  if (e.target === this) closePastChatsModal();
+});
+</script>
+</body>
+</html>
